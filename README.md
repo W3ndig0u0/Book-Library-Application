@@ -1,24 +1,16 @@
 # FlappyBirdAI
-Flappy Bird AI Trainer
-This project is a Flappy Bird AI Trainer implemented using Python and the NEAT (NeuroEvolution of Augmenting Topologies) algorithm. The goal is to train an AI agent to play Flappy Bird, an addictive mobile game where the player controls a bird and navigates it through a series of pipes without colliding.
-
-Features
-AI agent: The trainer utilizes the NEAT algorithm to train an AI agent to play Flappy Bird. The agent learns to make decisions on when to flap its wings to avoid colliding with the pipes.
-Python: The trainer is implemented in Python, a powerful and widely-used programming language, making it easy to understand and modify the code.
-NEAT: NEAT is an evolutionary algorithm that evolves neural networks with a variable number of nodes and connections. It allows the AI agent to adapt and improve its performance over time.
-Flappy Bird Game: The trainer includes the Flappy Bird game itself, where you can watch the AI agent play or even play the game manually.
-Requirements
-To run the Flappy Bird AI Trainer, you need to have the following:
-
-Python 3.x: Make sure you have Python 3.x installed on your system.
-
-NEAT-Python: Install the NEAT-Python library to use the NEAT algorithm. You can install it using pip:
-
 ![image](https://github.com/W3ndig0u0/FlappyBirdAI/assets/70271139/dc40aa4a-4834-4aa8-bcba-572083879751)
 
-Copy code
-pip install neat-python
-Usage
+This project is a Flappy Bird AI Trainer implemented in Python using the NEAT (NeuroEvolution of Augmenting Topologies) algorithm. The purpose of this trainer is to train an artificial intelligence (AI) agent to play the popular game Flappy Bird.
+
+Features
+NEAT algorithm: The trainer uses NEAT, a genetic algorithm that evolves neural networks to optimize their performance in playing Flappy Bird.
+Python implementation: The project is written in Python, making it accessible and easy to understand for developers familiar with the language.
+Simple UI: The user interface provides a basic display of the game screen and training progress, allowing you to monitor the AI's performance.
+Settings menu: Although currently under development, the trainer will eventually include a settings menu where you can customize various parameters to fine-tune the AI training process.
+Installation
+To run the Flappy Bird AI Trainer, please follow these steps:
+
 Clone the repository:
 
 bash
@@ -29,26 +21,41 @@ Navigate to the project directory:
 bash
 Copy code
 cd flappy-bird-ai-trainer
-Run the trainer:
+(Optional) Create and activate a virtual environment:
 
+bash
 Copy code
-python trainer.py
-This will start the training process, and you will see the AI agent playing Flappy Bird in the console.
+python3 -m venv env
+source env/bin/activate  # Linux/Mac
+env\Scripts\activate  # Windows
+Install the required dependencies:
 
-Alternatively, you can play the game manually:
-
+bash
 Copy code
-python manual_play.py
-Use the spacebar to flap the bird's wings and navigate through the pipes.
+pip install -r requirements.txt
+Start the Flappy Bird AI Trainer:
 
-In Progress
-Currently, the ability to save and use the best model is still in progress. We are working on implementing this feature to allow you to save the trained AI agent and use it for future gameplay.
+bash
+Copy code
+python main.py
+Follow the on-screen instructions to interact with the trainer.
 
-Note
-Please note that the settings menu is currently locked, and you cannot change any settings such as the AI's population size, mutation rates, or game difficulty. We are actively working on adding customization options to enhance the training experience.
+Important Note
+Please note that the current version of the Flappy Bird AI Trainer does not support saving and using the best model. This functionality is still a work in progress and will be added in future updates.
 
 Contributing
-We welcome contributions to the Flappy Bird AI Trainer project. If you find any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request on the project's GitHub repository.
+Contributions to the project are welcome! If you would like to contribute, please follow these steps:
+
+Fork the repository on GitHub.
+Create a new branch from the main branch.
+Make your changes and commit them with descriptive messages.
+Push your changes to your forked repository.
+Submit a pull request to the main repository.
+License
+This project is licensed under the MIT License. Feel free to use, modify, and distribute the code as per the terms of the license.
+
+Acknowledgements
+The Flappy Bird AI Trainer is inspired by the original Flappy Bird game created by Dong Nguyen and the NEAT algorithm developed by Kenneth O. Stanley and Risto Miikkulainen.
 
 License
 This project is licensed under the MIT License. Feel free to use, modify, and distribute the code as per the license terms.
