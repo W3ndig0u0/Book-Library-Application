@@ -3,6 +3,7 @@ import time
 import os
 import random
 import neat
+import pickle
 
 pygame.font.init()
 
@@ -341,7 +342,8 @@ def evalGenomes(genomes, config):
         drawWindow(win, birds, pipes, base, score, GEN, BEST_SCORE)
 
 
-def run(configPath):
+def run(configPath, fromPickle=False):
+    winner = None
     config = neat.config.Config(
         neat.DefaultGenome,
         neat.DefaultReproduction,
@@ -351,15 +353,32 @@ def run(configPath):
     )
 
     p = neat.Population(config)
-
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
     winner = p.run(evalGenomes, 1000)
 
+    with open(aiPickleFile, "wb") as f:
+        pickle.dump(winner, f)
+        print("Saved AI to pickle file.")
+
 
 def play():
     localDir = os.path.dirname(__file__)
     configPath = os.path.join(localDir, "config-feedforward.txt")
-    run(configPath)
+    aiPickleFile = os.path.join(localDir, "winner.pkl")
+
+    if os.path.exists(aiPickleFile):
+        # Load the AI from the pickle file
+        with open(aiPickleFile, "rb") as f:
+            winner = pickle.load(f)
+            run(configPath, fromPickle=True)
+        print("Using pre-existing AI from pickle file.")
+    else:
+        # Run the NEAT algorithm to train the AI
+        run(configPath)
+        return
+
+
+play()
