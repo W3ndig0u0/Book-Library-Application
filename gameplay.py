@@ -379,6 +379,3 @@ def play():
         # Run the NEAT algorithm to train the AI
         run(configPath)
         return
-
-
-play()
