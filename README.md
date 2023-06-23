@@ -14,7 +14,7 @@ Python 3.x: Make sure you have Python 3.x installed on your system.
 
 NEAT-Python: Install the NEAT-Python library to use the NEAT algorithm. You can install it using pip:
 
-![image](https://github.com/W3ndig0u0/FlappyBirdAI/assets/70271139/a4909cc7-61e2-4652-aa01-3f8ab8b8522b)
+![image](https://github.com/W3ndig0u0/FlappyBirdAI/assets/70271139/dc40aa4a-4834-4aa8-bcba-572083879751)
 
 Copy code
 pip install neat-python
