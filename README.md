@@ -1,6 +1,7 @@
 # FlappyBirdAI
 
-!(https://github.com/W3ndig0u0/FlappyBirdAI/blob/main/assets/flappy_bird.png)
+![image](https://github.com/W3ndig0u0/FlappyBirdAI/assets/70271139/af98ae85-4dd6-4e57-ae8f-80eada7a136b)
+
 
 This project is a Flappy Bird AI Trainer implemented in Python using the NEAT (NeuroEvolution of Augmenting Topologies) algorithm. The purpose of this trainer is to train an artificial intelligence (AI) agent to play the popular game Flappy Bird.
 
