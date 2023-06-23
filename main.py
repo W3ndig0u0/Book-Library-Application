@@ -4,8 +4,12 @@ import os
 import random
 import neat
 
+pygame.font.init()
+
 WIN_WIDTH = 550
 WIN_HEIGHT = 800
+FONT = pygame.font.SysFont("comicsas", 60)
+SMALL_FONT = pygame.font.SysFont("comicsas", 24)
 
 BIRD_IMGS = [
     pygame.transform.scale2x(
@@ -105,10 +109,10 @@ class Pipe:
         self.top = 0
         self.bottom = 0
 
-        self.PIPE_TOP = pygame.transform.flip(PIPE_IMGS[0], false, True)
-        self.PIPE_BOTTOm = PIPE_IMGS[0]
+        self.PIPE_TOP = pygame.transform.flip(PIPE_IMGS[0], False, True)
+        self.PIPE_BOTTOM = PIPE_IMGS[0]
 
-        self.passed = false
+        self.passed = False
         self.set_height()
 
     def set_height(self):
@@ -119,34 +123,195 @@ class Pipe:
     def move(self):
         self.x -= self.VEL
 
-    def draw(self):
+    def draw(self, win):
         win.blit(self.PIPE_TOP, (self.x, self.top))
-        win.blit(self.PIPE_BOTTOm, (self.x, self.bottom))
+        win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
+
+    def collide(self, bird):
+        birdMask = bird.getMask()
+        topMask = pygame.mask.from_surface(self.PIPE_TOP)
+        bottomMask = pygame.mask.from_surface(self.PIPE_BOTTOM)
+
+        topOffset = (self.x - bird.x, self.top - round(bird.y))
+        bottomOffset = (self.x - bird.x, self.bottom - round(bird.y))
+
+        topPoint = birdMask.overlap(topMask, topOffset)
+        bottomPoint = birdMask.overlap(bottomMask, bottomOffset)
+
+        if topPoint or bottomPoint:
+            return True
+
+        return False
 
 
-def drawWindow(win, bird):
+class Base:
+    VEL = 5
+    WIDTH = BASE_IMGS[0].get_width()
+    IMG = BASE_IMGS[0]
+
+    def __init__(self, y):
+        self.y = y
+        self.x1 = 0
+        self.x2 = self.WIDTH
+
+    def move(self):
+        self.x1 -= self.VEL
+        self.x2 -= self.VEL
+
+        if self.x1 + self.WIDTH < 0:
+            self.x1 = self.WIDTH + self.x2
+
+        if self.x2 + self.WIDTH < 0:
+            self.x2 = self.WIDTH + self.x1
+
+    def draw(self, win):
+        win.blit(self.IMG, (self.x1, self.y))
+        win.blit(self.IMG, (self.x2, self.y))
+
+
+def drawWindow(win, birds, pipes, base, score):
     win.blit(BG_IMGS[0], (0, 0))
-    bird.draw(win)
+
+    for pipe in pipes:
+        pipe.draw(win)
+
+    for bird in birds:
+        bird.draw(win)
+
+    base.draw(win)
+    text = SMALL_FONT.render("W3ndig0", 1, (0, 0, 0))
+    scoreText = FONT.render("Score: " + str(score), 1, (255, 255, 255))
+    win.blit(scoreText, (WIN_WIDTH - 10 - scoreText.get_width(), 5))
+
+    win.blit(text, (WIN_WIDTH - 5 - text.get_width(), WIN_HEIGHT - text.get_height()))
     pygame.display.update()
 
 
-def main():
-    bird = Bird(200, 200)
+def evalGenomes(genomes, config):
+    nets = []
+    genom = []
+    birds = []
+
+    for _, g in genomes:
+        net = neat.nn.FeedForwardNetwork.create(g, config)
+        nets.append(net)
+        birds.append(Bird(230, 350))
+        g.fitness = 0
+        genom.append(g)
+
+    pipes = [Pipe(WIN_WIDTH + 100)]
+    base = Base(730)
+    score = 0
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-    run = True
     clock = pygame.time.Clock()
+
+    jump_flag = False
+    gameOver = False
+    run = True
 
     while run:
         clock.tick(30)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                pygame.quit()
+                quit()
 
-        # bird.move()
-        drawWindow(win, bird)
+        pipeInd = 0
+        if len(birds) > 0:
+            if (
+                len(pipes) > 1
+                and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width()
+            ):
+                pipeInd = 1
+        else:
+            run = False
+            break
 
-    pygame.quit()
-    quit()
+        for x, bird in enumerate(birds):
+            bird.move()
+            genom[x].fitness += 0.1
+
+            output = nets[x].activate(
+                (bird.y),
+                abs(bird.y - pipes[pipeInd].height),
+                abs(bird.y - pipes[pipeInd].bottom),
+            )
+
+            if output[0] > 0.5:
+                bird.jump()
+
+        addPipe = False
+        rem = []
+        bird.move()
+
+        # if event.type == pygame.MOUSEBUTTONDOWN:
+        #     if not jump_flag and not gameOver:
+        #         bird.jump()
+        #         jump_flag = True
+
+        # if event.type == pygame.MOUSEBUTTONUP:
+        #     jump_flag = False
+
+        for pipe in pipes:
+            for x, bird in enumerate(birds):
+                if pipe.collide(bird):
+                    gameOver = True
+                    genom[x].fitness -= 1
+                    birds.pop(x)
+                    nets.pop(x)
+                    genom.pop(x)
+
+                if not pipe.passed and pipe.x < bird.x:
+                    pipe.passed = True
+                    addPipe = True
+
+            if pipe.x + pipe.PIPE_TOP.get_width() < 0:
+                rem.append(pipe)
+
+            # if not gameOver:
+            #     pipe.move()
+            #     base.move()
+
+        if addPipe:
+            score += 1
+            for g in genom:
+                g.fitness += 10
+            pipes.append(Pipe(WIN_WIDTH + 100))
+
+        for r in rem:
+            pipes.remove(r)
+
+        for x, bird in enumerate(birds):
+            if bird.y + bird.img.get_height() >= 730 or bird.y < 0:
+                gameOver = True
+                genom[x].fitness -= 1
+                birds.pop(x)
+                nets.pop(x)
+                genom.pop(x)
+
+        drawWindow(win, birds, pipes, base, score)
 
 
-main()
+def run(configPath):
+    config = neat.config.Config(
+        neat.DefaultGenome,
+        neat.DefaultReproduction,
+        neat.DefaultSpeciesSet,
+        neat.DefaultStagnation,
+        configPath,
+    )
+
+    p = neat.Population(config)
+
+    p.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+
+    winner = p.run(evalGenomes, 50)
+
+
+if __name__ == "__main__":
+    localDir = os.path.dirname(__file__)
+    configPath = os.path.join(localDir, "config-feedforward.txt")
+    run(configPath)
